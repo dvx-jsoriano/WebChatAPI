@@ -12,20 +12,20 @@
 This is a project WebChatAPI built in Laravel 8 from scratch. Development installation, configurations and steps on how this was build are wriiten below for reference.
 
 ## Create New App
-laravel new WebChatAPI
+- `laravel new WebChatAPI`
 
 ## Install Laravel UI with Authentication
-composer require laravel/ui
-php artisan ui vue --auth
-npm install
-npm run dev
+1. `composer require laravel/ui`
+2. `php artisan ui vue --auth`
+3. `npm install`
+4. `npm run dev`
 
 ## JWT Authentication
 
 - Install JWT
-composer require tymon/jwt-auth
-php artisan vendor:publish --provider="Tymon\JWTAuth\Providers\LaravelServiceProvider"
-php artisan jwt:secret
+1. `composer require tymon/jwt-auth`
+2. `php artisan vendor:publish --provider="Tymon\JWTAuth\Providers\LaravelServiceProvider"`
+3. `php artisan jwt:secret`
 
 - Update your User Model
 
