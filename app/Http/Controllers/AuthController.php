@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Agent;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -16,7 +18,24 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login']]);
+        $this->middleware('auth:api', ['except' => ['register', 'login']]);
+    }
+
+    /**
+     * Register a user.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function register(Request $request)
+    {
+        $user = Agent::create([
+             'agent_username' => $request->agent_username,
+             'agent_password' => bcrypt($request->agent_password),
+         ]);
+
+        $token = auth()->login($user);
+
+        return $this->respondWithToken($token);
     }
 
     /**
@@ -24,17 +43,18 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function login()
+    public function login(Request $request)
     {
         try {
-            $credentials = request(['email', 'password']);
+            $credentials = $request->only(['username', 'password']);
 
-            if (!$token = auth()->attempt($credentials)) {
+            if (!$token = auth()->attempt(['agent_username' => $request->agent_username, 'password' => $request->agent_password])) {
                 return response()->json(['error' => 'Unauthorized'], 401);
             }
+
             return $this->respondWithToken($token);
         } catch (Exception $ex) {
-            return "Error " . $ex->getMessage();
+            return response()->json(['error' => $ex->getMessage()], 404);
         }
     }
 
