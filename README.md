@@ -88,5 +88,12 @@ class User extends Authenticatable implements JWTSubject
 
 ## Migrations
 
-* `php artisan make:migration create_users_table`
+* `php artisan make:migration create_agents_table`
+* `php artisan make:migration create_auxes_table`
+* `php artisan make:migration create_campaigns_table`
+* `php artisan make:migration create_templates_table`
+* `php artisan make:migration create_customers_table`
+
+* `php artisan make:migration create_chat_sessions_table --create=chat_sessions`
+* `php artisan make:migration create_chat_live_table --create=chat_live`
 
