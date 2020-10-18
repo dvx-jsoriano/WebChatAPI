@@ -9,7 +9,7 @@
 
 ## Introduction
 
-This is a project WebChatAPI built in Laravel 8 from scratch. Development installation, configurations and steps on how this was build are wriiten below for reference.
+This is a project WebChatAPI built in Laravel 8 from scratch. Development installation, configurations and steps on how this was built were written below for reference.
 
 ## Create New App
 - `laravel new WebChatAPI`
@@ -85,3 +85,8 @@ class User extends Authenticatable implements JWTSubject
     ],
 ],
 ```
+
+## Migrations
+
+* `php artisan make:migration create_users_table`
+
