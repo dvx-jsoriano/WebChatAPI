@@ -97,3 +97,12 @@ class User extends Authenticatable implements JWTSubject
 * `php artisan make:migration create_chat_sessions_table --create=chat_sessions`
 * `php artisan make:migration create_chat_live_table --create=chat_live`
 
+
+## Adding API Resource in API Route
+```
+Route::apiResource('<route-name>', 'App\Http\Controllers\<controller-name>');
+```
+
+## Factory Command using Tinker
+`Agent::factory()->count(10)->create();`
+
