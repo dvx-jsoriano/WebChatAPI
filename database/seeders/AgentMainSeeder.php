@@ -24,7 +24,7 @@ class AgentMainSeeder extends Seeder
         DB::table('agents')->truncate();
 
         DB::table('agents')->insert([
-            'agent_username' => $faker->userName,
+            'agent_username' => 'system',
             'agent_password' => Hash::make('P@ssw0rd'),
             'agent_handle' => $faker->name,
             'agent_first' => $faker->firstName,
@@ -33,7 +33,16 @@ class AgentMainSeeder extends Seeder
         ]);
 
         DB::table('agents')->insert([
-            'agent_username' => $faker->userName,
+            'agent_username' => 'jsoriano',
+            'agent_password' => Hash::make('P@ssw0rd'),
+            'agent_handle' => $faker->name,
+            'agent_first' => $faker->firstName,
+            'agent_last' => $faker->lastName,
+            'agent_type' => 'DEVELOPER',
+        ]);
+
+        DB::table('agents')->insert([
+            'agent_username' => 'administrator',
             'agent_password' => Hash::make('P@ssw0rd'),
             'agent_handle' => $faker->name,
             'agent_first' => $faker->firstName,
@@ -42,12 +51,21 @@ class AgentMainSeeder extends Seeder
         ]);
 
         DB::table('agents')->insert([
-            'agent_username' => $faker->userName,
+            'agent_username' => 'super001',
             'agent_password' => Hash::make('P@ssw0rd'),
             'agent_handle' => $faker->name,
             'agent_first' => $faker->firstName,
             'agent_last' => $faker->lastName,
-            'agent_type' => 'ADMIN',
+            'agent_type' => 'SUPERVISOR',
+        ]);
+
+        DB::table('agents')->insert([
+            'agent_username' => 'agent002',
+            'agent_password' => Hash::make('P@ssw0rd'),
+            'agent_handle' => $faker->name,
+            'agent_first' => $faker->firstName,
+            'agent_last' => $faker->lastName,
+            'agent_type' => 'AGENT',
         ]);
 
         //Factory::create(App\Models\Agent::class, 10);

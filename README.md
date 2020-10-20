@@ -89,6 +89,7 @@ class User extends Authenticatable implements JWTSubject
 ## Migrations
 
 * `php artisan make:migration create_agents_table`
+* `php artisan make:migration create_agents_type_table`
 * `php artisan make:migration create_auxes_table`
 * `php artisan make:migration create_campaigns_table`
 * `php artisan make:migration create_templates_table`
@@ -97,12 +98,23 @@ class User extends Authenticatable implements JWTSubject
 * `php artisan make:migration create_chat_sessions_table --create=chat_sessions`
 * `php artisan make:migration create_chat_live_table --create=chat_live`
 
+## Create Model
+php artisan make:model Agent
+php artisan make:resource Agent
+php artisan make:resource Agents --collection
+php artisan make:resource AgentCollection
 
-## Adding API Resource in API Route
+## Controller
+php artisan make:controller --api
+
+## Adding API Resource (Controller) in API Route --Laravel 8 new way
 ```
 Route::apiResource('<route-name>', 'App\Http\Controllers\<controller-name>');
 ```
 
+## Create and Run Seeder
+`php artisan make:seeder AgentMainSeeder`
+`php artisan db:seed --class=AgentMainSeeder`
+
 ## Factory Command using Tinker
 `Agent::factory()->count(10)->create();`
-
