@@ -16,7 +16,7 @@ class CreateChatSessionsTable extends Migration
         Schema::create('chat_sessions', function (Blueprint $table) {
             $table->id();
             $table->integer('ticket_id');
-            $table->uuid('session_id')->unique();
+            $table->string('session_id', 16)->unique();
             $table->integer('agent_id')->default(0);
             $table->string('status')->default('QUEUED');
             $table->integer('campaign_id')->default(0);
