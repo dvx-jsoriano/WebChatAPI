@@ -100,22 +100,25 @@ class User extends Authenticatable implements JWTSubject
 * `php artisan make:migration create_tickets_table`
 
 ## Create Model
-`php artisan make:model Agent`
-`php artisan make:resource Agent`
-`php artisan make:resource Agents --collection`
-`php artisan make:resource AgentCollection`
+* `php artisan make:model Agent`
+* `php artisan make:resource Agent`
+* `php artisan make:resource Agents --collection`
+* `php artisan make:resource AgentCollection`
 
 ## Controller
 `php artisan make:controller --api`
 
 ## Adding API Resource (Controller) in API Route --Laravel 8 new way
 ```
+// Not working anymore
+Route::apiResource('<route-name>', '<controller-name>');
+// Working
 Route::apiResource('<route-name>', 'App\Http\Controllers\<controller-name>');
 ```
 
 ## Create and Run Seeder
-`php artisan make:seeder AgentMainSeeder`
-`php artisan db:seed --class=AgentMainSeeder`
+* `php artisan make:seeder AgentMainSeeder`
+* `php artisan db:seed --class=AgentMainSeeder`
 
 ## Factory Command using Tinker
 `Agent::factory()->count(10)->create();`
