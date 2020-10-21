@@ -42,12 +42,21 @@ class AgentMainSeeder extends Seeder
         ]);
 
         DB::table('agents')->insert([
+            'agent_username' => 'technical',
+            'agent_password' => Hash::make('P@ssw0rd'),
+            'agent_handle' => $faker->name,
+            'agent_first' => $faker->firstName,
+            'agent_last' => $faker->lastName,
+            'agent_type' => 'TECHNICAL',
+        ]);
+
+        DB::table('agents')->insert([
             'agent_username' => 'administrator',
             'agent_password' => Hash::make('P@ssw0rd'),
             'agent_handle' => $faker->name,
             'agent_first' => $faker->firstName,
             'agent_last' => $faker->lastName,
-            'agent_type' => 'ADMIN',
+            'agent_type' => 'ADMINISTRATOR',
         ]);
 
         DB::table('agents')->insert([
