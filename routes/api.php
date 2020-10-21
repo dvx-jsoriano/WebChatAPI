@@ -47,5 +47,4 @@ Route::get('/test-random', function () {
     $data->push(["string rand numbers" => $value]);
 
     return $data;
-    //return Illuminate\Support\Str::random(16);
 });

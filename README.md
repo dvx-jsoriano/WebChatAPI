@@ -117,9 +117,12 @@ Route::apiResource('<route-name>', 'App\Http\Controllers\<controller-name>');
 ```
 
 ## Create and Run Seeder
-* `php artisan make:seeder AgentMainSeeder`
-* `php artisan db:seed --class=AgentMainSeeder`
+* `php artisan make:seeder DatabaseSeeder`
+* `php artisan db:seed --class=DatabaseSeeder`
 
 ## Factory Command using Tinker
 `Agent::factory()->count(10)->create();`
 
+## Customized Class
+- Custom Class created in App\Custom named `WebChat`
+- `WebChat->GenerateSessionID($code)` used to generate a randomized 16 digit number and a parameterized single letter in the first character.
