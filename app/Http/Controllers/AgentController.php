@@ -27,14 +27,32 @@ class AgentController extends Controller
     public function index(Request $request)
     {
         try {
+            $agent = Agent::query();
+
             // Without this initial where refactor, the search filter doesn't work.
-            $agent = Agent::where('active', 1);
+            if ($request->has('active'))
+                $agent->where('active', $request->active);
+            else
+                $agent->where('active', 1);
 
             // Filtering name from search keyword
             if ($request->has('search_name')) {
-                $agent->where('handle_name', 'like', '%' . $request->search_name . '%');
+                $agent->where(function ($agent_query) use ($request) {
+                    $agent_query->where('agent_handle', 'like', '%' . $request->search_name . '%')
+                        ->orWhere('agent_first', 'like', '%' . $request->search_name . '%')
+                        ->orWhere('agent_last', 'like', '%' . $request->search_name . '%');
+                });
             }
 
+            //Filtering type
+            if ($request->has('type'))
+                $agent->where('agent_type', strtoupper($request->type));
+
+            //Filtering status
+            if ($request->has('status'))
+                $agent->where('status', strtoupper($request->status));
+
+            //Execute the select query built by refactoring
             $agents = $agent->get();
             return ResourcesAgent::collection($agents);
         } catch (Exception $ex) {
@@ -104,14 +122,14 @@ class AgentController extends Controller
     {
         try {
             $result = Agent::findOrFail($id);
-            if ($result) {
-                return new ResourcesAgent($result);
-            } else {
-                return response()->json(['status' => "Invalid argument."], 404);
-            }
+            //If found return the result
+            return new ResourcesAgent($result);
+        } catch (ModelNotFoundException $ex) {
+            Log::error('retrieving an agent.', [$ex->getMessage()]);
+            return response()->json(['status' => 'Agent not found.'], 404);
         } catch (Exception $ex) {
             Log::error('retrieving an agent.', [$ex->getMessage()]);
-            return response()->json(['status' => $ex->getMessage()], 500);
+            return response()->json(['status' => $ex->getMessage()], 400);
         }
     }
 

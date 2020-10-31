@@ -126,3 +126,6 @@ Route::apiResource('<route-name>', 'App\Http\Controllers\<controller-name>');
 ## Customized Class
 - Custom Class created in App\Custom named `WebChat`
 - `WebChat->GenerateSessionID($code)` used to generate a randomized 16 digit number and a parameterized single letter in the first character.
+
+## Database Design
+- The database structure can be found [here](https://dbdesigner.page.link/kfHidtAzk8k4ndGT8).
