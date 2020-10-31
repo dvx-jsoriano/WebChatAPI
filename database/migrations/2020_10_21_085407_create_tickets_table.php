@@ -15,7 +15,7 @@ class CreateTicketsTable extends Migration
     {
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
-            $table->string('session_id')->unique();         // for integrity
+            //$table->string('session_id')->unique();         // for integrity
             $table->string('ticket_refno')->default('');    // needs checking
             $table->dateTime('datetime_created');
             $table->string('ticket_type');                  // WEBCHAT
