@@ -32,7 +32,7 @@ This is a project WebChatAPI built in Laravel 8 from scratch. Development instal
 ```
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
@@ -43,6 +43,34 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class User extends Authenticatable implements JWTSubject
 {
     use HasFactory, Notifiable;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'agent_username', 
+        'agent_password',
+    ];
+
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'agent_password', 'remember_token',
+    ];
+
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
 
     // Rest omitted for brevity
 
@@ -66,24 +94,6 @@ class User extends Authenticatable implements JWTSubject
         return [];
     }
 }
-```
-
-- Configure the Auth guard
-
-```
-'defaults' => [
-    'guard' => 'api',
-    'passwords' => 'users',
-],
-
-...
-
-'guards' => [
-    'api' => [
-        'driver' => 'jwt',
-        'provider' => 'users',
-    ],
-],
 ```
 
 ## Migrations
@@ -129,3 +139,202 @@ Route::apiResource('<route-name>', 'App\Http\Controllers\<controller-name>');
 
 ## Database Design
 - The database structure can be found [here](https://dbdesigner.page.link/kfHidtAzk8k4ndGT8).
+
+## Configure JWT Auth Guard To Point To Another Eloquent Model
+- This will make use of Agent eloquent instead of the default User eloquent
+
+- In `config/auth.php`
+```
+'defaults' => [
+        'guard' => 'api',
+        'passwords' => 'agent',
+    ],
+'guards' => [
+        'web' => [
+            'driver' => 'session',
+            'provider' => 'users',
+        ],
+        'api' => [
+            'driver' => 'jwt',
+            'provider' => 'agents',
+        ],
+    ],
+ 'providers' => [
+        'users' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\User::class,
+        ],
+
+        'agents' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Agent::class,
+        ],
+    ],
+'passwords' => [
+        'users' => [
+            'provider' => 'users',
+            'table' => 'password_resets',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+
+        'agents' => [
+            'provider' => 'agents',
+            'table' => 'password_resets',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+    ],
+```
+
+- In `App\Models\Agent`,
+
+```
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+//use Illuminate\Database\Eloquent\Model;
+use App\Models\User as Model;
+
+class Agent extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'agent_username',
+        'agent_password'
+    ];
+
+    public function getAuthPassword()
+    {
+        return $this->agent_password;
+    }
+}
+```
+
+In `App\Controllers\AuthController`,
+
+```
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Agent;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Controller;
+use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+
+class AuthController extends Controller
+{
+    /**
+     * Create a new AuthController instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth:api', ['except' => ['register', 'login']]);
+    }
+
+    /**
+     * Register a user.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function register(Request $request)
+    {
+        $user = Agent::create([
+             'agent_username' => $request->agent_username,
+             'agent_password' => bcrypt($request->agent_password),
+         ]);
+
+        $token = auth()->login($user);
+
+        return $this->respondWithToken($token);
+    }
+
+    /**
+     * Get a JWT via given credentials.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function login(Request $request)
+    {
+        try {
+            $credentials = $request->only(['username', 'password']);
+
+            if (!$token = auth()->attempt(['agent_username' => $request->agent_username, 'password' => $request->agent_password])) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+
+            return $this->respondWithToken($token);
+        } catch (Exception $ex) {
+            return response()->json(['error' => $ex->getMessage()], 404);
+        }
+    }
+
+    /**
+     * Get the authenticated User.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function me()
+    {
+        return response()->json(auth()->user());
+    }
+
+    /**
+     * Log the user out (Invalidate the token).
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function logout()
+    {
+        auth()->logout();
+
+        return response()->json(['message' => 'Successfully logged out']);
+    }
+
+    /**
+     * Refresh a token.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function refresh()
+    {
+        return $this->respondWithToken(auth()->refresh());
+    }
+
+    /**
+     * Get the token array structure.
+     *
+     * @param  string $token
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function respondWithToken($token)
+    {
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => auth()->factory()->getTTL() * 60
+        ]);
+    }
+}
+```
+
+In `routes/api.php`,
+
+```
+use App\Http\Controllers\AuthController;
+...
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout']);
+Route::post('/refresh', [AuthController::class, 'refresh']);
+Route::post('/me', [AuthController::class, 'me']);
+```
